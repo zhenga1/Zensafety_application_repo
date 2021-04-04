@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.iml" filepath="$PROJECT_DIR$/.idea/modules/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RobotActivityLibrary/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotActivityLibrary.iml" filepath="$PROJECT_DIR$/.idea/modules/RobotActivityLibrary/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotActivityLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RobotDevSample/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotDevSample.iml" filepath="$PROJECT_DIR$/.idea/modules/RobotDevSample/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotDevSample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RobotLineFollow/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotLineFollow.iml" filepath="$PROJECT_DIR$/.idea/modules/RobotLineFollow/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotLineFollow.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RobotSensorSample/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotSensorSample.iml" filepath="$PROJECT_DIR$/.idea/modules/RobotSensorSample/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.RobotSensorSample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ZenboDialogSample/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.ZenboDialogSample.iml" filepath="$PROJECT_DIR$/.idea/modules/ZenboDialogSample/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.ZenboDialogSample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ZenboHelloWorld/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.ZenboHelloWorld.iml" filepath="$PROJECT_DIR$/.idea/modules/ZenboHelloWorld/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.ZenboHelloWorld.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/zensafety/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.zensafety.iml" filepath="$PROJECT_DIR$/.idea/modules/zensafety/ZenboJuniorSDK_and_SampleCode_v2.0.9.1927.2.zensafety.iml" />
+    </modules>
+  </component>
+</project>
