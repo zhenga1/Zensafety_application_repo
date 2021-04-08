@@ -81,8 +81,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="D:\Images\7d944b7a9afaf1a526d9b3e769085d98.png" />
-                                                <entry key="scalingPercent" value="60" />
+                                                <entry key="imagePath" value="C:\Users\Aaron Zheng\Downloads\maxresdefault.jpg" />
+                                                <entry key="scalingPercent" value="68" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -116,7 +116,7 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="ffffff" />
-                                      <entry key="outputName" value="zenbo" />
+                                      <entry key="outputName" value="zenbo_smart_business" />
                                     </map>
                                   </option>
                                 </PersistentState>
