@@ -1,6 +1,5 @@
 package com.example.zensafety;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,8 +11,7 @@ import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
-public class NotificationView extends RobotActivity {
-
+public class Zenbostate extends RobotActivity {
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
@@ -63,32 +61,22 @@ public class NotificationView extends RobotActivity {
 
         }
     };
-    public NotificationView(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback) {
+    public Zenbostate(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback) {
         super(robotCallback, robotListenCallback);
     }
-    public NotificationView(){
+    public Zenbostate()
+    {
         super(robotCallback,robotListenCallback);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification_view);
+        setContentView(R.layout.activity_zenbostate);
     }
-    public void changewhattosecure(View view)
-    {
-
+    public void showlog(View view){
+        //OPEN FILE WITH LOG
     }
-    public void checksecurity(View view)
-    {
-
-    }
-    public void viewnotifications(View view)
-    {
-        Intent intent = new Intent(getApplicationContext(),Zenbostate.class);
-        startActivity(intent);
-    }
-    public void goback(View view)
-    {
+    public void gobackzenbostate(View view){
         finish();
     }
 }

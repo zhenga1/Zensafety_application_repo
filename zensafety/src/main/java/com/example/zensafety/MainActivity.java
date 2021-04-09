@@ -1,18 +1,18 @@
 package com.example.zensafety;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
+import com.asus.robotframework.API.RobotFace;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
-public class NotificationView extends RobotActivity {
+public class MainActivity extends RobotActivity {
 
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
@@ -63,32 +63,36 @@ public class NotificationView extends RobotActivity {
 
         }
     };
-    public NotificationView(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback) {
-        super(robotCallback, robotListenCallback);
-    }
-    public NotificationView(){
-        super(robotCallback,robotListenCallback);
-    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification_view);
+        setContentView(R.layout.activity_main);
     }
-    public void changewhattosecure(View view)
-    {
+    @Override
+    protected void onStart() {
 
+        super.onStart();
+        //robotAPI.robot.setExpression(RobotFace.HAPPY);
+        robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
+        setContentView(R.layout.activity_main);
+        //robotAPI.release();
     }
-    public void checksecurity(View view)
-    {
-
+    public MainActivity() {
+        super(robotCallback, robotListenCallback);
     }
-    public void viewnotifications(View view)
+    public void launchapp(View view)
     {
-        Intent intent = new Intent(getApplicationContext(),Zenbostate.class);
+        Intent intent = new Intent(getApplicationContext(),NotificationView.class);
         startActivity(intent);
     }
-    public void goback(View view)
-    {
-        finish();
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+    public void aboutus(View view){
+        Intent intent = new Intent(getApplicationContext(),Aboutus.class);
+        startActivity(intent);
     }
 }

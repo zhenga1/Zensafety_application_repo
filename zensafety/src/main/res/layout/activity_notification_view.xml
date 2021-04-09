@@ -8,10 +8,122 @@
 
     <TextView
         android:id="@+id/textView5"
-        android:layout_width="211dp"
-        android:layout_height="108dp"
+        android:layout_width="200dp"
+        android:layout_height="0dp"
         android:text="Notifications"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="-3dp"
-        tools:ignore="MissingConstraints"/>
+        android:textSize="30sp"
+        android:textColor="@color/brighter_dark_blue"
+        android:fontFamily="sans-serif-condensed-medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.03"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.060000002" />
+
+    <Button
+        android:id="@+id/backbutton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GO BACK"
+        android:background="@android:color/holo_green_light"
+        android:textColor="@color/brighter_dark_blue"
+        android:textSize="20sp"
+        android:paddingLeft="10dp"
+        android:onClick="goback"
+        android:paddingRight="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.93"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.04000002" />
+
+    <Button
+        android:id="@+id/viewnotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:onClick="viewnotifications"
+        android:layout_marginBottom="8dp"
+        android:text="View Notifications"
+        android:textSize="25sp"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp"
+        android:textColor="@color/white"
+        android:background="@android:color/holo_red_light"
+        android:fontFamily="serif"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.11"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75" />
+
+    <Button
+        android:id="@+id/changewhattosecure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="changewhattosecure"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/greenish_turquoise"
+        android:fontFamily="serif"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:text="CHANGE WHAT TO SECURE"
+        android:textColor="@color/brighter_dark_blue"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewnotifications" />
+
+    <Button
+        android:id="@+id/checksecurity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_light"
+        android:fontFamily="serif"
+        android:paddingLeft="30dp"
+        android:onClick="checksecurity"
+        android:paddingRight="30dp"
+        android:text="Check the Security"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.912"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.739" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="329dp"
+        android:layout_height="227dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@mipmap/zenbo_locked_image_foreground" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:textSize="16sp"
+        android:text="(Zenbo will speak to directly notify the user)"
+        app:layout_constraintBottom_toTopOf="@+id/viewnotifications"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
 </android.support.constraint.ConstraintLayout>
