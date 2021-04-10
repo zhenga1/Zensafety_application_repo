@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.zensafety">
-
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,7 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ZenboJuniorSDK_and_SampleCode_v20919272">
-        <activity android:name=".Zenbostate"></activity>
+        <activity android:name=".CameraActivityView"></activity>
+        <activity android:name=".Zenbostate" />
         <activity android:name=".NotificationView" />
         <activity android:name=".Aboutus" />
         <activity android:name=".MainActivity">
@@ -19,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

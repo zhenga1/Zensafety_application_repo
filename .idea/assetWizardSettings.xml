@@ -81,7 +81,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="D:\Images\images.jpg" />
+                                                <entry key="imagePath" value="D:\Images\maxresdefault.jpg" />
                                                 <entry key="scalingPercent" value="101" />
                                               </map>
                                             </option>
@@ -115,7 +115,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="outputName" value="zenbo_locked_image" />
+                                      <entry key="outputName" value="zenbo_lockingdesign" />
                                     </map>
                                   </option>
                                 </PersistentState>

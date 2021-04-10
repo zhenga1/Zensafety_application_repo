@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.asus.robotframework.API.DialogSystem;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
@@ -13,7 +14,7 @@ import com.robot.asus.robotactivity.RobotActivity;
 import org.json.JSONObject;
 
 public class MainActivity extends RobotActivity {
-
+    public DialogSystem zenbo;
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
@@ -69,18 +70,20 @@ public class MainActivity extends RobotActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //zenbo.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
     }
     @Override
     protected void onStart() {
 
         super.onStart();
         //robotAPI.robot.setExpression(RobotFace.HAPPY);
-        robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
+        //robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
         setContentView(R.layout.activity_main);
         //robotAPI.release();
     }
     public MainActivity() {
         super(robotCallback, robotListenCallback);
+        //zenbo = robotAPI.robot;
     }
     public void launchapp(View view)
     {

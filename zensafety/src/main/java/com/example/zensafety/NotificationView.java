@@ -1,7 +1,6 @@
 package com.example.zensafety;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
@@ -13,7 +12,7 @@ import com.robot.asus.robotactivity.RobotActivity;
 import org.json.JSONObject;
 
 public class NotificationView extends RobotActivity {
-
+    public int requestCodeCamera = 0;
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
@@ -80,7 +79,12 @@ public class NotificationView extends RobotActivity {
     }
     public void checksecurity(View view)
     {
-
+        Intent intent = new Intent(getApplicationContext(),CameraActivityView.class);
+        startActivityForResult(intent,requestCodeCamera);
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        //dosomething
     }
     public void viewnotifications(View view)
     {
