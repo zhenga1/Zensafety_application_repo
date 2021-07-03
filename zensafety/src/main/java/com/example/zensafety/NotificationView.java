@@ -12,7 +12,7 @@ import com.robot.asus.robotactivity.RobotActivity;
 import org.json.JSONObject;
 
 public class NotificationView extends RobotActivity {
-    public int requestCodeCamera = 0;
+    public static final int requestCodeCamera = 0,requestCodeNotifications=1,requestCodeChoice=2;
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
@@ -75,7 +75,8 @@ public class NotificationView extends RobotActivity {
     }
     public void changewhattosecure(View view)
     {
-
+        Intent intent = new Intent(getApplicationContext(),ChooseItemActivity.class);
+        startActivityForResult(intent,requestCodeChoice);
     }
     public void checksecurity(View view)
     {
@@ -84,12 +85,26 @@ public class NotificationView extends RobotActivity {
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        //dosomething
+        switch(requestCode) {
+            case requestCodeCamera:
+                //codeblock
+                break;
+            case requestCodeChoice:
+                //codeblock
+                break;
+            case requestCodeNotifications:
+                //codeblock
+                break;
+            default:
+                break;
+
+        }
+
     }
     public void viewnotifications(View view)
     {
         Intent intent = new Intent(getApplicationContext(),Zenbostate.class);
-        startActivity(intent);
+        startActivityForResult(intent,requestCodeNotifications);
     }
     public void goback(View view)
     {

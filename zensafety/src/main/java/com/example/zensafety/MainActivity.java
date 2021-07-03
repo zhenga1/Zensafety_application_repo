@@ -70,7 +70,7 @@ public class MainActivity extends RobotActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //zenbo.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
+        zenbo.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
     }
     @Override
     protected void onStart() {
