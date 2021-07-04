@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
+import org.tensorflow.TensorFlow;
+import org.tensorflow.lite.Interpreter;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
@@ -30,7 +32,6 @@ public class Aboutus extends RobotActivity {
 
         }
     };
-
     public static RobotCallback.Listen robotListenCallback = new RobotCallback.Listen() {
         @Override
         public void onFinishRegister() {
@@ -73,7 +74,7 @@ public class Aboutus extends RobotActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aboutus);
-        robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
+        //robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
 
     }
     public void backaboutus(View view)

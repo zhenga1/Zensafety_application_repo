@@ -9,12 +9,12 @@ import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
 import com.asus.robotframework.API.RobotFace;
+import com.asus.robotframework.API.SpeakConfig;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
 public class MainActivity extends RobotActivity {
-    public DialogSystem zenbo;
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
@@ -70,7 +70,10 @@ public class MainActivity extends RobotActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        zenbo.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.");
+        SpeakConfig config = new SpeakConfig();
+        config.volume(60);
+        config.speed(100);
+        robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.",config);
     }
     @Override
     protected void onStart() {
