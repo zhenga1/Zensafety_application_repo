@@ -81,7 +81,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\Aaron Zheng\Downloads\453-4536553_flat-video-icon-png-video-calling-icon-png.png" />
+                                                <entry key="imagePath" value="C:\Users\Aaron Zheng\Desktop\logoforzensafety.png" />
                                                 <entry key="scalingPercent" value="101" />
                                               </map>
                                             </option>
@@ -115,7 +115,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="outputName" value="zenbo_start_recording" />
+                                      <entry key="backgroundColor" value="5ed9dc" />
+                                      <entry key="outputName" value="zenbo_logo" />
                                     </map>
                                   </option>
                                 </PersistentState>
