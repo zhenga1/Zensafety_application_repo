@@ -2,8 +2,13 @@ package com.example.zensafety;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.hardware.Camera;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -18,6 +23,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.util.Size;
@@ -33,6 +39,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.example.zensafety.Texts.OverlayView;
+import com.example.zensafety.tflite.ImageUtils;
+import com.example.zensafety.tflite.MultiBoxTracker;
+import com.example.zensafety.tflite.ObjectDetectionModel;
+import com.example.zensafety.tflite.ObjectDetector;
+import com.example.zensafety.tools.Logger;
 
 import java.io.CharArrayWriter;
 import java.io.File;
@@ -43,32 +57,47 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CameraActivityView extends CameraActivity {
+    private static final boolean MAINTAIN_ASPECT = false;
     private TextureView textureView;
     private ImageButton record;
     private String cameraid;
-    private Size previewsize,videosize;
+    private Size previewsize;
+    private Size videosize = new Size(640,480);
     private MediaRecorder mediaRecorder;
     private int totalrotation;
+    private static final float MINIMUM_CONFIDENCE = 0.5f;
     private CaptureRequest.Builder mCaptureRequestBuilder;
     private Handler handler;
     private static final int REQUEST_CAMERA_PERMISSION_RESULT = 0, REQUEST_STORAGE_PERMISSION_RESULT=1;
     private HandlerThread handlerthread;
     private boolean recordingornot=false;
+    private static final String MODEL_FILE = "objectdetect.tflite";
+    private static final String LABELS_FILE = "file:/objectlabelmap.txt";
     private Chronometer chronometer;
     private File videofolder;
     private String videofilename;
 
     private static SparseIntArray ORIENTATIONS = new SparseIntArray();
-
+    private ObjectDetector detector;
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);
         ORIENTATIONS.append(Surface.ROTATION_90, 1);
         ORIENTATIONS.append(Surface.ROTATION_180, 2);
         ORIENTATIONS.append(Surface.ROTATION_270, 3);
     }
+
+    private Logger logger = new Logger(this.getClass());
+    private int MODEL_INPUT_SIZE = 300;
+    private Bitmap rgbFrameBitmap,croppedBitmap;
+    private MultiBoxTracker tracker;
+    private Matrix frameToCropTransform,cropToFrameTransform;
+    private OverlayView overlayView;
+    private long timestamp;
+    private boolean computingImage;
 
     private static class CompareSizeByArea implements Comparator<Size> {
 
@@ -83,6 +112,7 @@ public class CameraActivityView extends CameraActivity {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             setupCamera(width,height);
             connectCamera();
+
             //Toast.makeText(getApplicationContext(), "Surface Texture is available", Toast.LENGTH_LONG);
         }
 
@@ -264,7 +294,12 @@ public class CameraActivityView extends CameraActivity {
                 checkwritestoragepermission();
             }
         });
-
+        Fragment fragment =
+                new CustomCameraFragment(
+                        this,
+                        R.layout.activity_notification_view,
+                        getDesiredPreviewFrameSize()
+                );
     }
     public void backbitten(View view)
     {
@@ -274,6 +309,7 @@ public class CameraActivityView extends CameraActivity {
     public void onResume() {
         super.onResume();
         startBackgroundThread();
+        computingImage=false;
         if(!textureView.isAvailable()){
             textureView.setSurfaceTextureListener(surfaceTextureListener);
         }else{
@@ -318,17 +354,109 @@ public class CameraActivityView extends CameraActivity {
 
     @Override
     protected Size getDesiredPreviewFrameSize() {
-        return null;
+        return videosize;
     }
 
     @Override
     protected void onPreviewSizeChosen(Size size, int rotation) {
 
+
+        try {
+            detector =
+                    ObjectDetectionModel.create(
+                            getAssets(),
+                            MODEL_FILE,
+                            LABELS_FILE,
+                            MODEL_INPUT_SIZE,
+                            true
+                    );
+        } catch (final IOException e) {
+            logger.e("Module could not be initialized");
+            finish();
+        }
+
+        previewWidth = size.getWidth();
+        previewHeight = size.getHeight();
+
+        int sensorOrientation = rotation - getScreenOrientation();
+
+        logger.i(getString(R.string.camera_orientation_relative, sensorOrientation));
+
+        logger.i(getString(R.string.initializing_size, previewWidth, previewHeight));
+        rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
+        croppedBitmap = Bitmap.createBitmap(MODEL_INPUT_SIZE, MODEL_INPUT_SIZE, Bitmap.Config.ARGB_8888);
+
+        frameToCropTransform =
+                ImageUtils.getTransformationMatrix(
+                        previewWidth, previewHeight,
+                        MODEL_INPUT_SIZE, MODEL_INPUT_SIZE,
+                        sensorOrientation,
+                        MAINTAIN_ASPECT
+                );
+        cropToFrameTransform = new Matrix();
+        frameToCropTransform.invert(cropToFrameTransform);
+        //IMPORTANT LINE
+        tracker = new MultiBoxTracker(this);
+        overlayView = findViewById(R.id.overlay);
+        overlayView.addCallback(
+                canvas -> {
+                    tracker.draw(canvas);
+//                    if (BuildConfig.DEBUG) {
+//                        tracker.drawDebug(canvas);
+//                    }
+                });
+
+        tracker.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation);
     }
 
     @Override
     protected void processImage() {
+        ++timestamp; //no need to be changed
+        final long currTimestamp = timestamp;
+        overlayView.postInvalidate();
 
+        // No mutex needed as this method is not reentrant.
+        if (computingImage) {
+            readyForNextImage();
+            return;
+        }
+        computingImage = true;
+        logger.i("Preparing image " + currTimestamp + " for module in bg thread.");
+
+        rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
+
+        readyForNextImage();
+
+        final Canvas canvas = new Canvas(croppedBitmap);
+        canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
+
+        runInBackground(
+                () -> {
+                    final long startTime = SystemClock.uptimeMillis();
+                    // 輸出結果
+                    // importantthing
+                    final List<ObjectDetector.Recognition> results = detector.recognizeImage(
+                            croppedBitmap);
+                    long lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
+                    logger.i("Running detection on image " + lastProcessingTimeMs);
+
+                    final List<ObjectDetector.Recognition> mappedRecognitions = new LinkedList<>();
+
+                    for (final ObjectDetector.Recognition result : results) {
+                        final RectF location = result.getLocation();
+                        if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE) {
+
+                            cropToFrameTransform.mapRect(location);
+
+                            result.setLocation(location);
+                            mappedRecognitions.add(result);
+                        }
+                    }
+
+                    tracker.trackResults(mappedRecognitions, currTimestamp);
+                    overlayView.postInvalidate();
+                    computingImage = false;
+                });
     }
 
     @Override
