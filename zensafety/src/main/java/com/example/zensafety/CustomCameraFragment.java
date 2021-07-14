@@ -1,4 +1,6 @@
 package com.example.zensafety;
+import com.example.zensafety.Texts.AutoFitTextureView;
+import com.example.zensafety.tflite.ImageUtils;
 import com.example.zensafety.tools.Logger;
 
 import android.annotation.SuppressLint;
@@ -35,7 +37,7 @@ public class CustomCameraFragment extends Fragment {
     private Size desiredSize;
     private int layout;
 
-    private TextureView textureView;
+    private AutoFitTextureView textureView;
 
     private HandlerThread backgroundThread;
 
@@ -45,6 +47,7 @@ public class CustomCameraFragment extends Fragment {
         this.layout = layout;
         this.desiredSize = desiredSize;
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class CustomCameraFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        textureView = view.findViewById(R.id.texture);
     }
 
     @Override
@@ -64,6 +68,12 @@ public class CustomCameraFragment extends Fragment {
         // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
         // a camera and start preview from here (otherwise, we wait until the surface is ready in
         // the SurfaceTextureListener).
+
+        if (textureView.isAvailable()) {
+            camera.startPreview();
+        } else {
+            textureView.setSurfaceTextureListener(surfaceTextureListener);
+        }
     }
 
     @Override
@@ -80,6 +90,68 @@ public class CustomCameraFragment extends Fragment {
         stopCamera();
         super.onDestroy();
     }
+
+    private final TextureView.SurfaceTextureListener surfaceTextureListener =
+            new TextureView.SurfaceTextureListener() {
+                @Override
+                public void onSurfaceTextureAvailable(
+                        final SurfaceTexture texture, final int width, final int height) {
+
+                    int index = getCameraId();
+                    camera = Camera.open(index);
+
+                    try {
+                        Camera.Parameters parameters = camera.getParameters();
+                        List<String> focusModes = parameters.getSupportedFocusModes();
+                        if (focusModes != null
+                                && focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                        }
+                        List<Camera.Size> cameraSizes = parameters.getSupportedPreviewSizes();
+                        Size[] sizes = new Size[cameraSizes.size()];
+                        int i = 0;
+                        for (Camera.Size size : cameraSizes) {
+                            sizes[i++] = new Size(size.width, size.height);
+                            //Log.e("test","Width"+size.width+"   Height"+size.height);
+                        }
+                        Size previewSize = chooseOptimalSize(
+                                sizes, desiredSize.getWidth(), desiredSize.getHeight());
+                        parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
+                        //Log.e("test2","Width"+previewSize.getWidth()+"   Height"+previewSize.getHeight());
+                        //camera.setDisplayOrientation(90);
+                        camera.setParameters(parameters);
+                        camera.setPreviewTexture(texture);
+                    } catch (IOException exception) {
+                        camera.release();
+                    }
+
+                    camera.setPreviewCallbackWithBuffer(imageListener);
+                    Camera.Size s = camera.getParameters().getPreviewSize();
+                    camera.addCallbackBuffer(new byte[ImageUtils.getYUVByteSize(s.width, s.height)]);
+
+                    textureView.setAspectRatio(s.width, s.height);
+                    // Calculate the Container size
+                    View container = getActivity().findViewById(R.id.containertwo);
+                    ViewGroup.LayoutParams lp = container.getLayoutParams();
+                    float aspectRatio = (float)s.width/(float)s.height;
+                    lp.width = Math.round(height*aspectRatio);
+                    container.setLayoutParams(lp);
+
+                    camera.startPreview();
+                }
+
+                @Override
+                public void onSurfaceTextureSizeChanged(
+                        final SurfaceTexture texture, final int width, final int height) {}
+
+                @Override
+                public boolean onSurfaceTextureDestroyed(final SurfaceTexture texture) {
+                    return true;
+                }
+
+                @Override
+                public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
+            };
 
     private int getCameraId() {
         Camera.CameraInfo ci = new Camera.CameraInfo();
@@ -171,3 +243,4 @@ public class CustomCameraFragment extends Fragment {
         }
     }
 }
+

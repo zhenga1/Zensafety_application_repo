@@ -36,9 +36,11 @@ dependencies {
     implementation "androidx.appcompat:appcompat-resources:1.2.0"
     implementation 'android.arch.navigation:navigation-ui:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.wear:wear:1.1.0'
     testImplementation 'junit:junit:4.+'
     implementation 'org.tensorflow:tensorflow-android:+'
     implementation 'org.tensorflow:tensorflow-lite:+'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    compileOnly 'com.google.android.wearable:wearable:2.8.1'
 }

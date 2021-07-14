@@ -58,23 +58,23 @@ public abstract class CameraActivity extends BaseActivity implements Camera.Prev
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN |
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        //setContentView(R.layout.activity_camera);
-
+        setContentView(R.layout.activity_new_camera);
         if(!hasPermissions(PERMISSION_CAMERA)) {
             requestPermission(REQUEST_CAMERA, PERMISSION_CAMERA);
-        } else{
+        }
+        else {
             initCamera();
         }
     }
 
     private void initCamera() {
-        /*Fragment fragment =
-                new LegacyCameraConnectionFragment(
+        Fragment fragment =
+                new CustomCameraFragment(
                         this,
-                        R.layout.camera_connection_fragment_tracking,
+                        R.layout.cameraconnectionfragment,
                         getDesiredPreviewFrameSize()
                 );
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();*/
+        getSupportFragmentManager().beginTransaction().replace(R.id.containertwo, fragment).commit();
     }
 
     @Override

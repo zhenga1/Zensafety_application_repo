@@ -294,12 +294,6 @@ public class CameraActivityView extends CameraActivity {
                 checkwritestoragepermission();
             }
         });
-        Fragment fragment =
-                new CustomCameraFragment(
-                        this,
-                        R.layout.activity_notification_view,
-                        getDesiredPreviewFrameSize()
-                );
     }
     public void backbitten(View view)
     {

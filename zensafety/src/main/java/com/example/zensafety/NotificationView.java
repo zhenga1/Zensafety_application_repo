@@ -12,7 +12,7 @@ import com.robot.asus.robotactivity.RobotActivity;
 import org.json.JSONObject;
 
 public class NotificationView extends RobotActivity {
-    public static final int requestCodeCamera = 0,requestCodeNotifications=1,requestCodeChoice=2;
+    public static final int requestCodeCamera = 0,requestCodeNotifications=1,requestCodeChoice=2, requestCodeSecurity=3;
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
         public void onResult(int cmd, int serial, RobotErrorCode err_code, Bundle result) {
@@ -78,10 +78,15 @@ public class NotificationView extends RobotActivity {
         Intent intent = new Intent(getApplicationContext(),ChooseItemActivity.class);
         startActivityForResult(intent,requestCodeChoice);
     }
-    public void checksecurity(View view)
+    public void seezenbo(View view)
     {
         Intent intent = new Intent(getApplicationContext(),CameraActivityView.class);
         startActivityForResult(intent,requestCodeCamera);
+    }
+    public void checksecurity(View view)
+    {
+        Intent intent = new Intent(getApplicationContext(),NewCameraActivity.class);
+        startActivityForResult(intent,requestCodeSecurity);
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -93,6 +98,9 @@ public class NotificationView extends RobotActivity {
                 //codeblock
                 break;
             case requestCodeNotifications:
+                //codeblock
+                break;
+            case requestCodeSecurity:
                 //codeblock
                 break;
             default:
