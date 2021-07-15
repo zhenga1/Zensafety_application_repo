@@ -11,7 +11,12 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.Size;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.zensafety.Texts.OverlayView;
@@ -22,6 +27,9 @@ import com.example.zensafety.tflite.ObjectDetector;
 import com.example.zensafety.tools.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,6 +39,8 @@ public class NewCameraActivity extends CameraActivity {
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
     private static final boolean MAINTAIN_ASPECT = false;
 
+    private static short state=-1;
+    private static Double rating=Double.POSITIVE_INFINITY;
     private static final String MODEL_FILE = "objectdetect.tflite";
     private static final String LABELS_FILE = "file:///android_asset/objectlabelmap.txt";
     private static final int MODEL_INPUT_SIZE = 300;
@@ -52,18 +62,21 @@ public class NewCameraActivity extends CameraActivity {
     private OverlayView trackingOverlay;
     private MultiBoxTracker tracker;
     private TextView tv_debug;
+    private LinearLayout security_window;
+    private TextView basic_stat,detailed_stat,whats_secured;
+    private final float Threshold_security_rating = 0.5f;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        showWindow();
         tv_debug = findViewById(R.id.tv_debug);
     }
-
     @Override
     public void onResume() {
         super.onResume();
-
         computingImage = false;
+        setText();
     }
 
     @Override
@@ -166,13 +179,15 @@ public class NewCameraActivity extends CameraActivity {
                     logger.i("Running detection on image " + lastProcessingTimeMs);
 
                     final List<ObjectDetector.Recognition> mappedRecognitions = new LinkedList<>();
-
+                    ArrayList<Float> confidences = new ArrayList<>();
                     for (final ObjectDetector.Recognition result : results) {
                         final RectF location = result.getLocation();
                         if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE) {
-
+                            if(ChooseItemActivity.chosenone.equals(result.getTitle()))
+                            {
+                                confidences.add(result.getConfidence());
+                            }
                             cropToFrameTransform.mapRect(location);
-
                             result.setLocation(location);
                             mappedRecognitions.add(result);
                         }
@@ -184,16 +199,77 @@ public class NewCameraActivity extends CameraActivity {
 
                     runOnUiThread(
                             () -> {
+                                calculateSecurity(confidences);
                                 tv_debug.setText(lastProcessingTimeMs +"ms");
+                                tv_debug.setVisibility(View.VISIBLE);
                             });
                 });
     }
+    private void calculateSecurity(ArrayList<Float> confidences){
+        if(confidences.size()<=0)
+        {
+            detailed_stat.setText(Integer.toString(0));
+            if(ChooseItemActivity.chosenone.equals("nothing"))
+            {
+                basic_stat.setText("Not Applicable");
+            }else {
+                basic_stat.setText("Not Found");
+            }
+            return;
+        }
+        Float f = Collections.max(confidences);
+        Double newrating = f + (1-f)/(2.5*confidences.size());
+        short status=0;
+        if(newrating >= 0.909f)status=10;
+        else if(newrating >= 0.8181f) status = 9;
+        else if(newrating >= 0.7272f) status = 8;
+        else if(newrating >= 0.6363f) status = 7;
+        else if(newrating >= 0.5454f) status = 6;
+        else if(newrating >= 0.4545f) status = 5;
+        else if(newrating >= 0.3636f) status = 4;
+        else if(newrating >= 0.2727f) status = 3;
+        else if(newrating >= 0.1818f) status = 2;
+        else if(newrating >= 0.0909f) status = 1;
+        state = status;
+        detailed_stat.setText(Short.toString(status));
+        rating = newrating;
+        if(newrating>Threshold_security_rating) basic_stat.setText("Secure");
+        else basic_stat.setText("Not Secure");
 
+    }
     private Bitmap flip(Bitmap d) {
         Matrix m = new Matrix();
         m.preScale(-1, 1);
         Bitmap dst = Bitmap.createBitmap(d, 0, 0, d.getWidth(), d.getHeight(), m, false);
         dst.setDensity(DisplayMetrics.DENSITY_DEFAULT);
         return dst;
+    }
+    public void setText(){
+        if(state==-1){
+            basic_stat.setText("Processing");
+        }else{
+            basic_stat.setText(Short.toString(state));
+        }
+        if(rating==Double.POSITIVE_INFINITY){
+            detailed_stat.setText("Processing");
+        }else{
+            if(rating>Threshold_security_rating) basic_stat.setText("Secure");
+            else basic_stat.setText("Not Secure");
+        }
+        whats_secured.setText(ChooseItemActivity.chosenone);
+    }
+    public void showWindow(){
+        LayoutInflater layoutInflater = getLayoutInflater();
+        security_window = (LinearLayout)layoutInflater.inflate(R.layout.security_info_window_view,null);
+        basic_stat = (TextView)security_window.findViewById(R.id.basicsecuritystat);
+        detailed_stat = (TextView)security_window.findViewById(R.id.detailedsecuritystat);
+        whats_secured = (TextView)security_window.findViewById(R.id.whatsbeingsecured);
+        basic_stat.setVisibility(View.VISIBLE);
+        detailed_stat.setVisibility(View.VISIBLE);
+        whats_secured.setVisibility(View.VISIBLE);
+        setText();
+        FrameLayout parent = (FrameLayout)findViewById(R.id.containerthree);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT);
+        parent.addView(security_window,layoutParams);
     }
 }

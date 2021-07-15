@@ -60,7 +60,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CameraActivityView extends CameraActivity {
+public class CameraActivityView extends AppCompatActivity {
     private static final boolean MAINTAIN_ASPECT = false;
     private TextureView textureView;
     private ImageButton record;
@@ -346,112 +346,6 @@ public class CameraActivityView extends CameraActivity {
         stopBackgroundThread();
     }
 
-    @Override
-    protected Size getDesiredPreviewFrameSize() {
-        return videosize;
-    }
-
-    @Override
-    protected void onPreviewSizeChosen(Size size, int rotation) {
-
-
-        try {
-            detector =
-                    ObjectDetectionModel.create(
-                            getAssets(),
-                            MODEL_FILE,
-                            LABELS_FILE,
-                            MODEL_INPUT_SIZE,
-                            true
-                    );
-        } catch (final IOException e) {
-            logger.e("Module could not be initialized");
-            finish();
-        }
-
-        previewWidth = size.getWidth();
-        previewHeight = size.getHeight();
-
-        int sensorOrientation = rotation - getScreenOrientation();
-
-        logger.i(getString(R.string.camera_orientation_relative, sensorOrientation));
-
-        logger.i(getString(R.string.initializing_size, previewWidth, previewHeight));
-        rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Bitmap.Config.ARGB_8888);
-        croppedBitmap = Bitmap.createBitmap(MODEL_INPUT_SIZE, MODEL_INPUT_SIZE, Bitmap.Config.ARGB_8888);
-
-        frameToCropTransform =
-                ImageUtils.getTransformationMatrix(
-                        previewWidth, previewHeight,
-                        MODEL_INPUT_SIZE, MODEL_INPUT_SIZE,
-                        sensorOrientation,
-                        MAINTAIN_ASPECT
-                );
-        cropToFrameTransform = new Matrix();
-        frameToCropTransform.invert(cropToFrameTransform);
-        //IMPORTANT LINE
-        tracker = new MultiBoxTracker(this);
-        overlayView = findViewById(R.id.overlay);
-        overlayView.addCallback(
-                canvas -> {
-                    tracker.draw(canvas);
-//                    if (BuildConfig.DEBUG) {
-//                        tracker.drawDebug(canvas);
-//                    }
-                });
-
-        tracker.setFrameConfiguration(previewWidth, previewHeight, sensorOrientation);
-    }
-
-    @Override
-    protected void processImage() {
-        ++timestamp; //no need to be changed
-        final long currTimestamp = timestamp;
-        overlayView.postInvalidate();
-
-        // No mutex needed as this method is not reentrant.
-        if (computingImage) {
-            readyForNextImage();
-            return;
-        }
-        computingImage = true;
-        logger.i("Preparing image " + currTimestamp + " for module in bg thread.");
-
-        rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
-
-        readyForNextImage();
-
-        final Canvas canvas = new Canvas(croppedBitmap);
-        canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
-
-        runInBackground(
-                () -> {
-                    final long startTime = SystemClock.uptimeMillis();
-                    // 輸出結果
-                    // importantthing
-                    final List<ObjectDetector.Recognition> results = detector.recognizeImage(
-                            croppedBitmap);
-                    long lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
-                    logger.i("Running detection on image " + lastProcessingTimeMs);
-
-                    final List<ObjectDetector.Recognition> mappedRecognitions = new LinkedList<>();
-
-                    for (final ObjectDetector.Recognition result : results) {
-                        final RectF location = result.getLocation();
-                        if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE) {
-
-                            cropToFrameTransform.mapRect(location);
-
-                            result.setLocation(location);
-                            mappedRecognitions.add(result);
-                        }
-                    }
-
-                    tracker.trackResults(mappedRecognitions, currTimestamp);
-                    overlayView.postInvalidate();
-                    computingImage = false;
-                });
-    }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus)

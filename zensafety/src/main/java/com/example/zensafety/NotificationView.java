@@ -7,6 +7,8 @@ import android.view.View;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
+import com.asus.robotframework.API.RobotFace;
+import com.asus.robotframework.API.SpeakConfig;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
@@ -65,6 +67,12 @@ public class NotificationView extends RobotActivity {
     public NotificationView(RobotCallback robotCallback, RobotCallback.Listen robotListenCallback) {
         super(robotCallback, robotListenCallback);
     }
+    @Override
+    public void onStart(){
+        super.onStart();
+       // robotAPI.robot.setExpression(RobotFace.HAPPY);
+
+    }
     public NotificationView(){
         super(robotCallback,robotListenCallback);
     }
@@ -72,6 +80,9 @@ public class NotificationView extends RobotActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_view);
+        SpeakConfig config = new SpeakConfig();
+        config.volume(60);
+        robotAPI.robot.speak("Zensafety can help you secure your most valued posessions. Feel free to explore!",config);
     }
     public void changewhattosecure(View view)
     {
