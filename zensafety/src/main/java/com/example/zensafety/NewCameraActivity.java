@@ -1,7 +1,7 @@
 package com.example.zensafety;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,9 +9,9 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
-import android.util.Pair;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,12 +26,22 @@ import com.example.zensafety.tflite.ObjectDetectionModel;
 import com.example.zensafety.tflite.ObjectDetector;
 import com.example.zensafety.tools.Logger;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class NewCameraActivity extends CameraActivity {
     private Logger logger = new Logger(this.getClass());
@@ -46,6 +56,7 @@ public class NewCameraActivity extends CameraActivity {
     private static final int MODEL_INPUT_SIZE = 300;
     // Minimum detection confidence to track a detection.
     private static final float MINIMUM_CONFIDENCE = 0.5f;
+    public static String states = "Not Secure", moreinfo = "Processing";
     private boolean HAS_FRONT_CAMERA = false;
 
     private ObjectDetector detector;
@@ -65,12 +76,40 @@ public class NewCameraActivity extends CameraActivity {
     private LinearLayout security_window;
     private TextView basic_stat,detailed_stat,whats_secured;
     private final float Threshold_security_rating = 0.5f;
+    private File fileDirLocation,file;
+    private boolean error=false;
+    private ArrayList<List<String>> getdata = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        makefile();
         showWindow();
         tv_debug = findViewById(R.id.tv_debug);
+    }
+    private void makefile(){
+        File parent = Environment.getExternalStorageDirectory();
+        fileDirLocation = new File(parent, "Logs_for_zensafety");
+        /*String[] children = fileDirLocation.list();
+        for (int i = 0; i < children.length; i++)
+        {
+            new File(fileDirLocation, children[i]).delete();
+        }*/
+        if(!fileDirLocation.exists())
+        {
+            fileDirLocation.mkdirs();
+        }
+
+        file = new File(fileDirLocation,new SimpleDateFormat("MM-dd-yyyy").format(new Date())+".txt");
+        if(!file.exists())
+        {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                error = true;
+            }
+        }
     }
     @Override
     public void onResume() {
@@ -200,11 +239,40 @@ public class NewCameraActivity extends CameraActivity {
                     runOnUiThread(
                             () -> {
                                 calculateSecurity(confidences);
-                                tv_debug.setText(lastProcessingTimeMs +"ms");
+                                tv_debug.setText("Time taken to process frame"+lastProcessingTimeMs +"ms");
                                 tv_debug.setVisibility(View.VISIBLE);
                             });
                 });
     }
+    private void storeData(){
+        List<String> lis = Arrays.asList(new String[3]);
+        lis.set(0, ChooseItemActivity.chosenone);
+        lis.set(1, states);
+        lis.set(2,moreinfo);
+        getdata.add(lis);
+
+    }
+    private void writeToFile() throws IOException{
+       // FileOutputStream fOut = new FileOutputStream(file);
+
+        //BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fOut));
+        FileWriter fw = new FileWriter(file, true);
+        for (int i = 0; i < getdata.size(); i++) {
+            //One, two and three at the same time
+            fw.write("Secured Object:  " + getdata.get(i).get(0));
+            fw.write(System.getProperty( "line.separator" ));
+            fw.write("Security Status:  " + getdata.get(i).get(1));
+            fw.write(System.getProperty( "line.separator" ));
+            fw.write("More Info For the Security Rating:  " + getdata.get(i).get(2));
+            fw.write(System.getProperty( "line.separator" ));
+            fw.write("Time: " + new SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss").format(new Date()));
+            fw.write(System.getProperty( "line.separator" ));
+            fw.write(System.getProperty( "line.separator" ));
+        }
+        fw.flush();
+        fw.close();
+    }
+
     private void calculateSecurity(ArrayList<Float> confidences){
         if(confidences.size()<=0)
         {
@@ -235,7 +303,19 @@ public class NewCameraActivity extends CameraActivity {
         rating = newrating;
         if(newrating>Threshold_security_rating) basic_stat.setText("Secure");
         else basic_stat.setText("Not Secure");
+        states = (String) basic_stat.getText();
+        moreinfo = (String) detailed_stat.getText();
+        storeData();
 
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            writeToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     private Bitmap flip(Bitmap d) {
         Matrix m = new Matrix();
@@ -247,15 +327,25 @@ public class NewCameraActivity extends CameraActivity {
     public void setText(){
         if(state==-1){
             basic_stat.setText("Processing");
+            states = "Processing";
         }else{
             basic_stat.setText(Short.toString(state));
+            states = Short.toString(state);
         }
         if(rating==Double.POSITIVE_INFINITY){
             detailed_stat.setText("Processing");
+            moreinfo = "Processing";
         }else{
-            if(rating>Threshold_security_rating) basic_stat.setText("Secure");
-            else basic_stat.setText("Not Secure");
+            if(rating>Threshold_security_rating) {
+                basic_stat.setText("Secure");
+                states = "Secure";
+            }
+            else {
+                basic_stat.setText("Not Secure");
+                states = "Not Secure";
+            }
         }
+        storeData();
         whats_secured.setText(ChooseItemActivity.chosenone);
     }
     public void showWindow(){

@@ -82,7 +82,7 @@ public class NotificationView extends RobotActivity {
         setContentView(R.layout.activity_notification_view);
         SpeakConfig config = new SpeakConfig();
         config.volume(60);
-        robotAPI.robot.speak("Zensafety can help you secure your most valued posessions. Feel free to explore!",config);
+        //robotAPI.robot.speak("Zensafety can help you secure your most valued posessions. Feel free to explore!",config);
     }
     public void changewhattosecure(View view)
     {

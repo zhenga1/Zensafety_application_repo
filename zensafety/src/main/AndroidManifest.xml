@@ -16,15 +16,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ZenboJuniorSDK_and_SampleCode_v20919272">
+        <activity android:name=".LogActivity"></activity>
+        <activity android:name=".LogShowActivity" />
         <activity
             android:name=".NewCameraActivity"
-            android:tag=".NewCameraActivity">
-        </activity>
+            android:tag=".NewCameraActivity" />
         <!--
                Set to true if your app is Standalone, that is, it does not require the handheld
                app to run.
         -->
-
         <activity android:name=".ChooseItemActivity" />
         <activity android:name=".CameraActivityView" />
         <activity android:name=".Zenbostate" />

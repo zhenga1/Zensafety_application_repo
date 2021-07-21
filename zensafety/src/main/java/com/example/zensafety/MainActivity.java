@@ -73,7 +73,7 @@ public class MainActivity extends RobotActivity {
         //robotAPI.robot.setExpression(RobotFace.HAPPY);
         SpeakConfig config = new SpeakConfig();
         config.volume(60);
-        robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.",config);
+       // robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.",config);
         setContentView(R.layout.activity_main);
         //robotAPI.release();
      //   robotAPI.robot.speak("Hello world. I am Zenbo Junior and this is Zensafety at your service. Nice to meet you.",config);
